@@ -1,4 +1,26 @@
-local hitgroup = { "body", "head", "chest", "stomach", "left arm", "right arm", "left leg", "right leg", "neck", "?", "gear" }
+function HitGroup(INT_HITGROUP)
+    if INT_HITGROUP == nil then
+        return;
+    elseif INT_HITGROUP == 0 then
+        return "body";
+    elseif INT_HITGROUP == 1 then
+        return "head";
+    elseif INT_HITGROUP == 2 then
+        return "chest";
+    elseif INT_HITGROUP == 3 then
+        return "stomach";
+    elseif INT_HITGROUP == 4 then
+        return "left arm";
+    elseif INT_HITGROUP == 5 then
+        return "right arm";
+    elseif INT_HITGROUP == 6 then
+        return "left leg";
+    elseif INT_HITGROUP == 7 then
+        return "right leg";
+    elseif INT_HITGROUP == 10 then
+        return "body";
+    end
+end
 local activeHitLogs = {};
 
 function add(time, ...)
@@ -79,9 +101,7 @@ end
 
 function hitlog_game_event_callback(Event)
     local eventType = Event:GetName();
-    if (eventType == "round_start") then
-        return;
-    end
+
     local isHurt = eventType == 'player_hurt';
     local weaponFired = eventType == 'weapon_fire';
     if isHurt == false and weaponFired == false then
@@ -104,7 +124,7 @@ function hitlog_game_event_callback(Event)
                 { 255, 255, 255, "Hit " },
                 { 150, 185, 1, string.sub(user:GetName(), 0, 28) },
                 { 255, 255, 255, " in the " },
-                { 150, 185, 1, hitgroup[Event:GetInt('hitgroup') -1] },
+                { 150, 185, 1, HitGroup(Event:GetInt('hitgroup')) },
                 { 255, 255, 255, " for " },
                 { 150, 185, 1, damageDone },
                 { 255, 255, 255, " damage (" },
