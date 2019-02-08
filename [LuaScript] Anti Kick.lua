@@ -6,6 +6,13 @@ local enable = gui.Checkbox(settingsGroup, "rab_anti_kick_enabled", "Enable Anti
 local join_spec = gui.Checkbox(settingsGroup, "rab_anti_kick_join_soec", "Join Spectator", false);
 local threshold = gui.Slider(settingsGroup, "rab_anti_kick_threshold", "Scramble threshold %", 80, 1, 100);
 
+client.AllowListener("game_start");
+client.AllowListener("vote_cast");
+client.AllowListener("vote_changed");
+client.AllowListener("vote_failed");
+client.AllowListener("vote_passed");
+client.AllowListener("vote_ended");
+
 callbacks.Register("DispatchUserMessage", function(um)
     if (um:GetID() ~= 46 or enable:GetValue() ~= true) then return end;
     cool_down_delay, last_team_in, vote_count, potentialVotes = -1, -1, 1, 0;
@@ -32,7 +39,7 @@ callbacks.Register("Draw", function()
 end)
 
 callbacks.Register("FireGameEvent", function(e)
-    local en = e:GetName()
+    local en = e:GetName();
     if (enable:GetValue() ~= true or join_spec:GetValue() ~= true) then return end;
     if (en == "game_start") then
         cool_down_delay, last_team_in, last_cv, vote_count, potentialVotes = -1, -1, 1, 1, 0;
@@ -45,15 +52,15 @@ callbacks.Register("FireGameEvent", function(e)
             checkAndCallVote();
         end
     elseif (en == "vote_failed" or en == "vote_passed" or en == "vote_ended") then
-        cool_down_delay, last_team_in, last_cv, vote_count, potentialVotes = -1, -1, 1, 1, 0;
+        vote_count, potentialVotes = 1, 0;
     end
 end)
 
 function checkAndCallVote()
     if (potentialVotes == 0) then return end;
     local lp = entities.GetLocalPlayer();
-    if (((vote_count - 1) / (potentialVotes / 2) * 100) >= threshold:GetValue()) then
-        potentialVotes, vote_count = 0, 0;
+    if ((((vote_count - 1) / (potentialVotes / 2)) * 100) >= threshold:GetValue()) then
+        potentialVotes, vote_count = 0, 1;
         if (last_cv == 1) then
             client.Command("callvote ChangeLevel " .. engine.GetMapName());
             last_cv = 2;
