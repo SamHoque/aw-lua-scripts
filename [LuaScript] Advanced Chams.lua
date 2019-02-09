@@ -12,7 +12,7 @@ local enablePulsatingVarNames = { "rab_pmodal_pulsating_masterswitch", "rab_hand
 local pulsatingSpeedVarNames = { "rab_pmodal_pulsating_speed", "rab_hands_pulsating_speed", "rab_weapons_pulsating_speed", "rab_ghost_pulsating_speed", "rab_glow_pulsating_speed", "rab_crosshair_pulsating_speed" };
 
 
-function getMenuItems(checkBoxVarName, comboBoxVarName, editBoxVarName, chromaSpeedSliderVarName, alphaSliderVarName, enablePulsatingVarName, pulsatingSpeedVarName)
+local function getMenuItems(checkBoxVarName, comboBoxVarName, editBoxVarName, chromaSpeedSliderVarName, alphaSliderVarName, enablePulsatingVarName, pulsatingSpeedVarName)
     local menuItems = {};
     menuItems[1] = { "checkbox", checkBoxVarName, "Enable", { true } };
     menuItems[2] = { "combobox", comboBoxVarName, "Modification Type", { "Chroma", "Static" } };
@@ -25,7 +25,7 @@ function getMenuItems(checkBoxVarName, comboBoxVarName, editBoxVarName, chromaSp
     return menuItems;
 end
 
-function addMenuToGui(menus)
+local function addMenuToGui(menus)
     for i = 1, #menus do
         local menu = menus[i];
         local menuWindow = menu[1];
@@ -59,27 +59,27 @@ function addMenuToGui(menus)
     end
 end
 
-function getMenuItemsForID(id)
+local function getMenuItemsForID(id)
     return getMenuItems(checkboxVarNames[id], comboBoxVarNames[id], editboxVarNames[id], chromaSpeedVarNames[id], alphaVarNames[id], enablePulsatingVarNames[id], pulsatingSpeedVarNames[id])
 end
 
-pModalMenu = { chamsgroup, "Player Model", 0, 30, 200, 265, getMenuItemsForID(1) };
+local pModalMenu = { chamsgroup, "Player Model", 0, 30, 200, 265, getMenuItemsForID(1) };
 
-handsMenu = { chamsgroup, "Hands", 0, 310, 200, 265, getMenuItemsForID(2) };
+local handsMenu = { chamsgroup, "Hands", 0, 310, 200, 265, getMenuItemsForID(2) };
 
-weaponMenu = { chamsgroup, "Weapons", 210, 30, 200, 265, getMenuItemsForID(3) };
+local weaponMenu = { chamsgroup, "Weapons", 210, 30, 200, 265, getMenuItemsForID(3) };
 
-ghostMenu = { chamsgroup, "Ghost", 210, 310, 200, 265, getMenuItemsForID(4) };
+local ghostMenu = { chamsgroup, "Ghost", 210, 310, 200, 265, getMenuItemsForID(4) };
 
-glowMenu = { chamsgroup, "Glow", 420, 30, 200, 265, getMenuItemsForID(5) };
+local glowMenu = { chamsgroup, "Glow", 420, 30, 200, 265, getMenuItemsForID(5) };
 
-crosshairMenu = { chamsgroup, "Crosshair", 420, 310, 200, 265, getMenuItemsForID(6) };
+local crosshairMenu = { chamsgroup, "Crosshair", 420, 310, 200, 265, getMenuItemsForID(6) };
 
 addMenuToGui({ pModalMenu, handsMenu, weaponMenu, ghostMenu, glowMenu, crosshairMenu })
 
 gui.Text(mainWindow, "Advanced Chroma - Made by Rab");
 
-function getChamsVar(i)
+local function getChamsVar(i)
     if (i == 1) then
         return { { "clr_chams_ct_vis", "v" }, { "clr_chams_t_vis", "v" } };
     elseif (i == 2) then
@@ -89,28 +89,13 @@ function getChamsVar(i)
     elseif (i == 4) then
         return { { "clr_chams_ghost_client", "v" }, { "clr_chams_ghost_server", "v" }, { "clr_chams_historyticks", "v" } };
     elseif (i == 5) then
-        return { { "vis_glowalpha", "sf" }, {"clr_esp_box_ct_vis", "v"}, {"clr_esp_box_t_vis", "v"},{"clr_esp_box_ct_invis", "v"}, {"clr_esp_box_t_invis", "v"} };
+        return { { "vis_glowalpha", "sf" }, { "clr_esp_box_ct_vis", "v" }, { "clr_esp_box_t_vis", "v" }, { "clr_esp_box_ct_invis", "v" }, { "clr_esp_box_t_invis", "v" } };
     elseif (i == 6) then
-        return { { "clr_esp_crosshair", "v" }, {"clr_esp_crosshair_recoil", "v"}, {"clr_misc_hitmarker", "v"} };
+        return { { "clr_esp_crosshair", "v" }, { "clr_esp_crosshair_recoil", "v" }, { "clr_misc_hitmarker", "v" } };
     end;
 end
 
-function onDraw()
-    if input.IsButtonPressed(gui.GetValue("msc_menutoggle")) then
-        menuPressed = menuPressed == 0 and 1 or 0;
-    end
-    if (showMenu:GetValue()) then
-        mainWindow:SetActive(menuPressed);
-    else
-        mainWindow:SetActive(0);
-    end
-    if (not masterSwitch:GetValue()) then return end
-    for i = 1, #checkboxVarNames do
-        drawChams(checkboxVarNames[i], comboBoxVarNames[i], getChamsVar(i), alphaVarNames[i], editboxVarNames[i], enablePulsatingVarNames[i], pulsatingSpeedVarNames[i], chromaSpeedVarNames[i])
-    end
-end
-
-function drawChams(enabled, selection, chamsVars, alpha, hexInput, pulsating, pulsatingSpeed, chromaSpeed)
+local function drawChams(enabled, selection, chamsVars, alpha, hexInput, pulsating, pulsatingSpeed, chromaSpeed)
     if (gui.GetValue(enabled)) then
         local shouldPulsate = gui.GetValue(pulsating);
         local alphaValue = gui.GetValue(alpha);
@@ -125,7 +110,7 @@ function drawChams(enabled, selection, chamsVars, alpha, hexInput, pulsating, pu
     end
 end
 
-function getHexInput(hexInput)
+local function getHexInput(hexInput)
     local hex = gui.GetValue(hexInput);
     hex = hex:gsub("#", "");
     local validHex = validHexColor(hex);
@@ -145,15 +130,15 @@ function getHexInput(hexInput)
     return { 255, 0, 0 }
 end
 
-function validHexColor(color)
+local function validHexColor(color)
     return nil ~= (color:find("^%x%x%x%x%x%x$") or color:find("^%x%x%x$"));
 end
 
-function getPulsateAlpha(speed)
+local function getPulsateAlpha(speed)
     return math.floor(math.abs(math.sin(globals.CurTime() * speed) * 255));
 end
 
-function getFadeRGB(speed)
+local function getFadeRGB(speed)
     local r = math.floor(math.sin(globals.RealTime() * speed) * 127 + 128)
     local g = math.floor(math.sin(globals.RealTime() * speed + 2) * 127 + 128)
     local b = math.floor(math.sin(globals.RealTime() * speed + 4) * 127 + 128)
@@ -161,7 +146,7 @@ function getFadeRGB(speed)
 end
 
 
-function setChromaValue(keys, alpha, speed)
+local function setChromaValue(keys, alpha, speed)
     for i = 1, #keys do
         local rgb = getFadeRGB(gui.GetValue(speed));
         local key = keys[i];
@@ -170,12 +155,12 @@ function setChromaValue(keys, alpha, speed)
         if (wat == "v") then
             gui.SetValue(var, rgb[1], rgb[2], rgb[3], math.floor(alpha));
         elseif (wat == "sf") then
-            gui.SetValue(var, alpha/ 255);
+            gui.SetValue(var, alpha / 255);
         end
     end
 end
 
-function setGuiValues(keys, rgb, alpha)
+local function setGuiValues(keys, rgb, alpha)
     for i = 1, #keys do
         local key = keys[i];
         local var = key[1];
@@ -188,4 +173,17 @@ function setGuiValues(keys, rgb, alpha)
     end
 end
 
-callbacks.Register('Draw', onDraw);
+callbacks.Register('Draw', function()
+    if input.IsButtonPressed(gui.GetValue("msc_menutoggle")) then
+        menuPressed = menuPressed == 0 and 1 or 0;
+    end
+    if (showMenu:GetValue()) then
+        mainWindow:SetActive(menuPressed);
+    else
+        mainWindow:SetActive(0);
+    end
+    if (not masterSwitch:GetValue()) then return end
+    for i = 1, #checkboxVarNames do
+        drawChams(checkboxVarNames[i], comboBoxVarNames[i], getChamsVar(i), alphaVarNames[i], editboxVarNames[i], enablePulsatingVarNames[i], pulsatingSpeedVarNames[i], chromaSpeedVarNames[i])
+    end
+end);
