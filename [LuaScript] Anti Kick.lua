@@ -17,7 +17,7 @@ callbacks.Register("DispatchUserMessage", function(um)
     if (um:GetID() ~= 46 or enable:GetValue() ~= true) then return end;
     vote_count, potentialVotes = 1, 0;
     local lp = entities.GetLocalPlayer();
-    if (um:GetInt(3) == 0 and um:GetString(5) == lp:GetName()) then
+    if (um:GetInt(3) == 0 and um:GetString(2) == lp:GetIndex()) then
         is_me = true;
         checkAndCallVote();
     end;
