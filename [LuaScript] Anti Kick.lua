@@ -13,6 +13,27 @@ client.AllowListener("vote_failed");
 client.AllowListener("vote_passed");
 client.AllowListener("vote_ended");
 
+local function checkAndCallVote()
+    if (is_me ~= true or potentialVotes == 0) then return end;
+    local lp = entities.GetLocalPlayer();
+    if ((((vote_count - 1) / (potentialVotes / 2)) * 100) >= threshold:GetValue()) then
+        potentialVotes, vote_count = 0, 1;
+        if (last_cv == 1) then
+            client.Command("callvote ChangeLevel " .. engine.GetMapName());
+            last_cv = 2;
+        elseif (last_cv == 2) then
+            client.Command("callvote SwapTeams");
+            last_cv = 3;
+        elseif (last_cv == 3) then
+            client.Command("callvote ScrambleTeams");
+            last_cv = 1;
+        end
+        if (join_spec:GetValue() ~= true) then return end;
+        cool_down_delay, last_team_in = globals.RealTime() + 140, lp:GetTeamNumber();
+        client.Command("jointeam  1");
+    end
+end
+
 callbacks.Register("DispatchUserMessage", function(um)
     if (um:GetID() ~= 46 or enable:GetValue() ~= true) then return end;
     vote_count, potentialVotes = 1, 0;
@@ -56,24 +77,3 @@ callbacks.Register("FireGameEvent", function(e)
         vote_count, potentialVotes,is_me = 1, 0, false;
     end
 end)
-
-local function checkAndCallVote()
-    if (is_me ~= true or potentialVotes == 0) then return end;
-    local lp = entities.GetLocalPlayer();
-    if ((((vote_count - 1) / (potentialVotes / 2)) * 100) >= threshold:GetValue()) then
-        potentialVotes, vote_count = 0, 1;
-        if (last_cv == 1) then
-            client.Command("callvote ChangeLevel " .. engine.GetMapName());
-            last_cv = 2;
-        elseif (last_cv == 2) then
-            client.Command("callvote SwapTeams");
-            last_cv = 3;
-        elseif (last_cv == 3) then
-            client.Command("callvote ScrambleTeams");
-            last_cv = 1;
-        end
-        if (join_spec:GetValue() ~= true) then return end;
-        cool_down_delay, last_team_in = globals.RealTime() + 140, lp:GetTeamNumber();
-        client.Command("jointeam  1");
-    end
-end
