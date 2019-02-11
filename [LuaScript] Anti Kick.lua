@@ -3,7 +3,7 @@ local showMenu = gui.Checkbox(gui.Reference("MISC", "AUTOMATION", "Other"), "rab
 local mainWindow = gui.Window("rab_anti_kick", "Anti Kick", 200, 200, 165, 180);
 local settingsGroup = gui.Groupbox(mainWindow, "Settings", 13, 13, 140, 120);
 local enable = gui.Checkbox(settingsGroup, "rab_anti_kick_enabled", "Enable Anti Kick", false);
-local join_spec = gui.Checkbox(settingsGroup, "rab_anti_kick_join_soec", "Join Spectator", false);
+local join_spec = gui.Checkbox(settingsGroup, "rab_anti_kick_join_spec", "Join Spectator", false);
 local threshold = gui.Slider(settingsGroup, "rab_anti_kick_threshold", "Scramble threshold %", 80, 1, 100);
 
 client.AllowListener("game_start");
@@ -17,7 +17,7 @@ callbacks.Register("DispatchUserMessage", function(um)
     if (um:GetID() ~= 46 or enable:GetValue() ~= true) then return end;
     vote_count, potentialVotes = 1, 0;
     local lp = entities.GetLocalPlayer();
-    if (um:GetInt(3) == 0 and um:GetString(2) == lp:GetIndex()) then
+    if (um:GetInt(3) == 0 and um:GetString(5) == lp:GetName()) then
         is_me = true;
         checkAndCallVote();
     end;
@@ -33,7 +33,6 @@ callbacks.Register("Draw", function()
         mainWindow:SetActive(0);
     end
     if (cool_down_delay == -1 or last_team_in == -1 or enable:GetValue() ~= true or join_spec:GetValue() ~= true) then return end;
-    print(cool_down_delay, "  ", last_team_in)
     if (cool_down_delay < globals.RealTime()) then
         client.Command("jointeam  0 " .. last_team_in);
         cool_down_delay, last_team_in, vote_count, potentialVotes, is_me = -1, -1, 1, 0, false;
@@ -42,7 +41,7 @@ end)
 
 callbacks.Register("FireGameEvent", function(e)
     local en = e:GetName();
-    if (enable:GetValue() ~= true or join_spec:GetValue() ~= true) then return end;
+    if (enable:GetValue() ~= true) then return end;
     if (en == "game_start") then
         cool_down_delay, last_team_in, last_cv, vote_count, potentialVotes, is_me = -1, -1, 1, 1, 0, false;
     elseif (en == "vote_changed") then
@@ -58,7 +57,7 @@ callbacks.Register("FireGameEvent", function(e)
     end
 end)
 
-function checkAndCallVote()
+local function checkAndCallVote()
     if (is_me ~= true or potentialVotes == 0) then return end;
     local lp = entities.GetLocalPlayer();
     if ((((vote_count - 1) / (potentialVotes / 2)) * 100) >= threshold:GetValue()) then
