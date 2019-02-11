@@ -1,4 +1,7 @@
-function HitGroup(INT_HITGROUP)
+local activeHitLogs = {};
+local font = draw.CreateFont('Arial', 14, 14);
+
+local function HitGroup(INT_HITGROUP)
     if INT_HITGROUP == nil then
         return;
     elseif INT_HITGROUP == 0 then
@@ -21,9 +24,8 @@ function HitGroup(INT_HITGROUP)
         return "body";
     end
 end
-local activeHitLogs = {};
 
-function add(time, ...)
+local function add(time, ...)
     table.insert(activeHitLogs, {
         ["text"] = { ... },
         ["time"] = time,
@@ -34,10 +36,11 @@ function add(time, ...)
     })
 end
 
-function getMultiColorTextSize(lines)
+local function getMultiColorTextSize(lines)
     local fw = 0
     local fh = 0;
     for i = 1, #lines do
+        draw.SetFont(font);
         local w, h = draw.GetTextSize(lines[i][4])
         fw = fw + w
         fh = h;
@@ -45,11 +48,12 @@ function getMultiColorTextSize(lines)
     return fw, fh
 end
 
-function drawMultiColorText(x, y, lines)
+local function drawMultiColorText(x, y, lines)
     local x_pad = 0
     for i = 1, #lines do
         local line = lines[i];
         local r, g, b, msg = line[1], line[2], line[3], line[4]
+        draw.SetFont(font);
         draw.Color(r, g, b, 255);
         draw.Text(x + x_pad, y, msg);
         local w, _ = draw.GetTextSize(msg)
@@ -57,8 +61,8 @@ function drawMultiColorText(x, y, lines)
     end
 end
 
-function showLog(count, color, text, layer)
-    local y = 15 + (35 * (count - 1));
+local function showLog(count, color, text, layer)
+    local y = 15 + (42 * (count - 1));
     local w, h = getMultiColorTextSize(text)
     local mw = w < 150 and 150 or w
     if globals.RealTime() < layer.delay then
@@ -90,32 +94,25 @@ function showLog(count, color, text, layer)
     draw.FilledRect(layer.x_pad - layer.x_pad, y, layer.x_pad + 28, (h + y) + 20);
     draw.Color(c2[1], c2[2], c2[3], a);
     draw.FilledRect(layer.x_pad_b - layer.x_pad, y, layer.x_pad_b + 22, (h + y) + 20);
-    drawMultiColorText(layer.x_pad_b - mw + 18, y + 3 + 6, text)
+    drawMultiColorText(layer.x_pad_b - mw + 18, y + 9, text)
 end
 
-function hitlog_draw_callback()
-    for index, hitlog in pairs(activeHitLogs) do
-        showLog(index, hitlog.color, hitlog.text, hitlog)
-    end
-end
-
-function hitlog_game_event_callback(Event)
-    local eventType = Event:GetName();
-
-    local isHurt = eventType == 'player_hurt';
-    local weaponFired = eventType == 'weapon_fire';
+callbacks.Register('FireGameEvent', function(e)
+    local en = e:GetName();
+    local isHurt = en == 'player_hurt';
+    local weaponFired = en == 'weapon_fire';
     if isHurt == false and weaponFired == false then
         return
     end
     local localPlayer = entities.GetLocalPlayer();
-    local user = entities.GetByUserID(Event:GetInt('userid'));
+    local user = entities.GetByUserID(e:GetInt('userid'));
     if (localPlayer == nil or user == nil) then
         return;
     end
     if isHurt then
-        local attacker = entities.GetByUserID(Event:GetInt('attacker'));
-        local remainingHealth = Event:GetInt('health');
-        local damageDone = Event:GetInt('dmg_health');
+        local attacker = entities.GetByUserID(e:GetInt('attacker'));
+        local remainingHealth = e:GetInt('health');
+        local damageDone = e:GetInt('dmg_health');
         if (attacker == nil) then
             return;
         end
@@ -124,7 +121,7 @@ function hitlog_game_event_callback(Event)
                 { 255, 255, 255, "Hit " },
                 { 150, 185, 1, string.sub(user:GetName(), 0, 28) },
                 { 255, 255, 255, " in the " },
-                { 150, 185, 1, HitGroup(Event:GetInt('hitgroup')) },
+                { 150, 185, 1, HitGroup(e:GetInt('hitgroup')) },
                 { 255, 255, 255, " for " },
                 { 150, 185, 1, damageDone },
                 { 255, 255, 255, " damage (" },
@@ -136,7 +133,10 @@ function hitlog_game_event_callback(Event)
             -- todo implement miss shots
         end
     end
-end
+end);
 
-callbacks.Register('FireGameEvent', 'rab_hitlog_game_event_callback', hitlog_game_event_callback);
-callbacks.Register('Draw', 'rab_hitlog_draw_callback', hitlog_draw_callback);
+callbacks.Register('Draw', function()
+    for index, hitlog in pairs(activeHitLogs) do
+        showLog(index, hitlog.color, hitlog.text, hitlog)
+    end
+end);
