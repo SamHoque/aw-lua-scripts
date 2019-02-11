@@ -95,19 +95,19 @@ local function getChamsVar(i)
     end;
 end
 
-local function drawChams(enabled, selection, chamsVars, alpha, hexInput, pulsating, pulsatingSpeed, chromaSpeed)
-    if (gui.GetValue(enabled)) then
-        local shouldPulsate = gui.GetValue(pulsating);
-        local alphaValue = gui.GetValue(alpha);
-        if (shouldPulsate) then
-            alphaValue = getPulsateAlpha(gui.GetValue(pulsatingSpeed));
-        end
-        if (gui.GetValue(selection) == 0) then
-            setChromaValue(chamsVars, alphaValue, chromaSpeed);
-        else
-            setGuiValues(chamsVars, getHexInput(hexInput), alphaValue);
-        end
-    end
+local function getPulsateAlpha(speed)
+    return math.floor(math.abs(math.sin(globals.CurTime() * speed) * 255));
+end
+
+local function getFadeRGB(speed)
+    local r = math.floor(math.sin(globals.RealTime() * speed) * 127 + 128)
+    local g = math.floor(math.sin(globals.RealTime() * speed + 2) * 127 + 128)
+    local b = math.floor(math.sin(globals.RealTime() * speed + 4) * 127 + 128)
+    return { r, g, b };
+end
+
+local function validHexColor(color)
+    return nil ~= (color:find("^%x%x%x%x%x%x$") or color:find("^%x%x%x$"));
 end
 
 local function getHexInput(hexInput)
@@ -129,22 +129,6 @@ local function getHexInput(hexInput)
     end;
     return { 255, 0, 0 }
 end
-
-local function validHexColor(color)
-    return nil ~= (color:find("^%x%x%x%x%x%x$") or color:find("^%x%x%x$"));
-end
-
-local function getPulsateAlpha(speed)
-    return math.floor(math.abs(math.sin(globals.CurTime() * speed) * 255));
-end
-
-local function getFadeRGB(speed)
-    local r = math.floor(math.sin(globals.RealTime() * speed) * 127 + 128)
-    local g = math.floor(math.sin(globals.RealTime() * speed + 2) * 127 + 128)
-    local b = math.floor(math.sin(globals.RealTime() * speed + 4) * 127 + 128)
-    return { r, g, b };
-end
-
 
 local function setChromaValue(keys, alpha, speed)
     for i = 1, #keys do
@@ -169,6 +153,21 @@ local function setGuiValues(keys, rgb, alpha)
             gui.SetValue(var, rgb[1], rgb[2], rgb[3], math.floor(alpha));
         elseif (wat == "sf") then
             gui.SetValue(var, alpha / 255);
+        end
+    end
+end
+
+local function drawChams(enabled, selection, chamsVars, alpha, hexInput, pulsating, pulsatingSpeed, chromaSpeed)
+    if (gui.GetValue(enabled)) then
+        local shouldPulsate = gui.GetValue(pulsating);
+        local alphaValue = gui.GetValue(alpha);
+        if (shouldPulsate) then
+            alphaValue = getPulsateAlpha(gui.GetValue(pulsatingSpeed));
+        end
+        if (gui.GetValue(selection) == 0) then
+            setChromaValue(chamsVars, alphaValue, chromaSpeed);
+        else
+            setGuiValues(chamsVars, getHexInput(hexInput), alphaValue);
         end
     end
 end
