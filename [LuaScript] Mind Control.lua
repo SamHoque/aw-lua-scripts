@@ -1,6 +1,6 @@
 --Mind Control made by Rab(SamzSakerz#4758)
 if (SenseUI == nil) then RunScript("senseui.lua"); end;
-local selected, scroll, shouldCallVote, shouldStealName, showBots, showEnemies, showTeam, showGradient, shouldScramble, shouldSwitch, shouldChangeMap, nameToSteal, alreadyPressedKicked, alreadyPressedScramble, alreadyPressedSwitch, alreadyPressedChangeMap = 0, 0, false, false, false, true, true, true, false, false, false, nil, false, false, false, false;
+local selected, scroll, shouldCallVote, shouldStealName, showBots, showEnemies, showTeam, showGradient, shouldScramble, shouldSwitch, shouldChangeMap, nameToSteal, alreadyPressedKicked, alreadyPressedScramble, alreadyPressedSwitch, alreadyPressedChangeMap, shouldClearNameHistory = 0, 0, false, false, false, true, true, true, false, false, false, nil, false, false, false, false, false;
 
 
 local function fetchPlayers()
@@ -57,7 +57,6 @@ callbacks.Register("Draw", function()
         local players = fetchPlayers();
         if SenseUI.BeginGroup("rab_mindcontrol_players_info", "Players", 25, 25, 205, 250) then
             selected, scroll = SenseUI.Listbox(players[1], 11, false, selected, nil, scroll);
-            print(selected, ' ', scroll);
             SenseUI.EndGroup();
         end;
         if SenseUI.BeginGroup("rab_mindcontrol_player_info", "Player Info", 255, 25, 205, 150) then
@@ -113,25 +112,25 @@ callbacks.Register("Draw", function()
             SenseUI.EndGroup();
         end;
         if SenseUI.BeginGroup("rab_mindcontrol_misc", "Misc", 480, 150, 205, 130) then
-            shouldScramble = SenseUI.Button("Scramble Teams", 120, 25);
+            shouldScramble = SenseUI.Button("Scramble Teams", 120, 22);
             if shouldScramble then
                 if (alreadyPressedScramble ~= true) then
-                    client.Command("callvote SwapTeams");
+                    client.Command("callvote ScrambleTeams");
                     alreadyPressedScramble = true;
                 end;
             else
                 alreadyPressedScramble = false;
             end;
-            shouldSwitch = SenseUI.Button("Switch Teams", 120, 25);
+            shouldSwitch = SenseUI.Button("Switch Teams", 120, 22);
             if shouldSwitch then
                 if (alreadyPressedSwitch ~= true) then
-                    client.Command("callvote ScrambleTeams");
+                    client.Command("callvote SwapTeams");
                     alreadyPressedSwitch = true;
                 end;
             else
                 alreadyPressedSwitch = false;
             end;
-            shouldChangeMap = SenseUI.Button("Change Level", 120, 25);
+            shouldChangeMap = SenseUI.Button("Change Level", 120, 22);
             local mapName = engine.GetMapName();
             if shouldChangeMap and mapName ~= nil then
                 if (alreadyPressedChangeMap ~= true) then
@@ -140,6 +139,10 @@ callbacks.Register("Draw", function()
                 end;
             else
                 alreadyPressedChangeMap = false;
+            end;
+            shouldClearNameHistory = SenseUI.Button("Clear Name History", 120, 22);
+            if shouldClearNameHistory then
+                nameToSteal = nil;
             end;
             SenseUI.EndGroup();
         end;
