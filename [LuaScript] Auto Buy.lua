@@ -34,10 +34,10 @@ local printLogs = gui.Checkbox(autoBuyGroup, "rab_autobuy_printlogs", "Print Log
 local primaryWeaponSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_primary_weapon", "Primary Weapon", primaryWeapons[1][1], primaryWeapons[2][1], primaryWeapons[3][1], primaryWeapons[4][1], primaryWeapons[5][1]);
 local secondaryWeaponSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_secondary_weapon", "Secondary Weapon", secondaryWeapons[1][1], secondaryWeapons[2][1], secondaryWeapons[3][1], secondaryWeapons[4][1]);
 local armorSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_armor", "Armor", armors[1][1], armors[2][1], armors[3][1]);
-local granadeSlot1 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_1", "Grenade Slot #1", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1]);
-local granadeSlot2 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_2", "Grenade Slot #2", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1]);
-local granadeSlot3 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_3", "Grenade Slot #3", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1]);
-local granadeSlot4 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_4", "Grenade Slot #4", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1]);
+local granadeSlot1 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_1", "Grenade Slot #1", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1], granades[6][1]);
+local granadeSlot2 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_2", "Grenade Slot #2", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1], granades[6][1]);
+local granadeSlot3 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_3", "Grenade Slot #3", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1], granades[6][1]);
+local granadeSlot4 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_4", "Grenade Slot #4", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1], granades[6][1]);
 local taser = gui.Checkbox(autoBuyGroup, "rab_autobuy_taser", "Buy Taser", false);
 local defuseKit = gui.Checkbox(autoBuyGroup, "rab_autobuy_defusekit", "Buy Defuse Kit", false);
 gui.Text(mainWindow, "Auto Buy - Made By Rab(SamzSakerz#4758)");
