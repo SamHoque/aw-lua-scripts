@@ -20,6 +20,7 @@ local armors = {
     { "Kevlar Vest + Helmet", "vest", "vesthelm" };
 };
 local granades = {
+    { "Off", nil, nil };
     { "Grenade", "hegrenade", nil };
     { "Flashbang", "flashbang", nil };
     { "Smoke Grenade", "smokegrenade", nil };
@@ -89,7 +90,7 @@ callbacks.Register('FireGameEvent', function(e)
     if (taser:GetValue()) then
         buy('taser');
     end
-    buyGrenades({granadeSlot1, granadeSlot2, granadeSlot3, granadeSlot4});
+    buyGrenades({ granadeSlot1, granadeSlot2, granadeSlot3, granadeSlot4 });
 end);
 
 callbacks.Register("Draw", function()
