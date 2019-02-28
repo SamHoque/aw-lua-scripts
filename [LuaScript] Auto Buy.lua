@@ -96,8 +96,7 @@ end
 
 callbacks.Register('FireGameEvent', function(e)
     local lp, en, ui = entities.GetLocalPlayer(), e:GetName(), client.GetPlayerIndexByUserID(e:GetInt('userid'));
-    local lpi = lp:GetIndex();
-    if (enabled:GetValue() ~= true or lp == nil or en ~= "player_spawn" or ui ~= lpi) then return
+    if (enabled:GetValue() ~= true or lp == nil or en ~= "player_spawn" or ui ~= lp:GetIndex()) then return
     end;
     local stuffToBuy = {};
     table.insert(stuffToBuy, getSingleTableItem(primaryWeaponSelection, primaryWeapons))
