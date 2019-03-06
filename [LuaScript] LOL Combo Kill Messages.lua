@@ -59,7 +59,6 @@ callbacks.Register("Draw", function()
         playSoundForKill(kills);
         kill_table[1] = { kill[1], kill[2], true };
     end;
-
     draw.SetTexture(texture);
     draw.FilledRect(x, y, x + imgWidth, y + imgHeight);
     draw.SetFont(font);
