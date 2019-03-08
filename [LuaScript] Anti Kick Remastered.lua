@@ -59,15 +59,18 @@ local RabFonts = { Verdana17400 = draw.CreateFont("Verdana", 17, 400), Verdana13
 -- Register callback for our DispatchUserMessage event.
 callbacks.Register("DispatchUserMessage", function(um)
     local id = um:GetID();
+   -- if(id > 40 and id < 50) then print(id) end;
     if (id == 46 and enable:GetValue()) then
         local lp = entities.GetLocalPlayer();
         -- Entity Index of the person who started the vote
-        local vote_starter_entid = um:GetString(2);
+        local vote_starter_entid = um:GetInt(2);
         if (lp == nil) then
             return
-        end ;
+        end;
         local localPlayerIndex = lp:GetIndex();
+      --  print("vote started by id: " .. vote_starter_entid .. " our id is: ".. localPlayerIndex)
         if (vote_starter_entid == localPlayerIndex) then
+         --   print("we just called a vote")
             -- We are calling the vote so lets reset some cache
             self_voted, self_being_kicked, vote_yes_count, potentialVotes = true, false, 0, 0;
         else
@@ -77,17 +80,20 @@ callbacks.Register("DispatchUserMessage", function(um)
             -- Check if the vote is a callvote kick and if the person getting kicked is our name, or empty
             if (voteType == 0 and (personGettingKickedName == localPlayerName or personGettingKickedName == '')) then
                 self_being_kicked = true;
+                self_voted = false;
             end
-            self_voted = false;
         end
     elseif id == 48 then
         -- Check if the vote kick on us has failed and reset cache
-        if (self_voted or self_being_kicked) then
-            self_voted, self_being_kicked, vote_yes_count, potentialVotes = false, false, 0, 0;
+        if (self_being_kicked) then
+             self_being_kicked, vote_yes_count, potentialVotes = false, 0, 0;
         end
     elseif id == 47 then
         -- Check if we have swapped/scrambled/changed level if so lets reset the vote_cool_down value and reset cache.
-        if (self_voted and self_being_kicked ~= true) then
+       -- print('vote passed')
+       -- print("self_voted: ", tostring(self_voted))
+        if (self_voted) then
+         --   print('vote passed 2')
             self_voted, self_being_kicked, vote_yes_count, potentialVotes, vote_cool_down = false, false, 0, 0, 0;
         end
     end
@@ -169,7 +175,7 @@ callbacks.Register("Draw", function()
 
                 -- Lets cache the num of the last team we were in before joining specs
                 local teamNum = lp:GetTeamNumber();
-                last_team_in = switchTeam:GetValue() and (teamNum == 1 and 2 or 1) or teamNum
+                last_team_in = switchTeam:GetValue() and (teamNum == 2 and 3 or 2) or teamNum
                 client.Command("jointeam  1");
             end
             -- check if we are in spectators and vote_cool_down has ended
