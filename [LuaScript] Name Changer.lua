@@ -106,6 +106,8 @@ callbacks.Register("Draw", function()
     local lp = entities.GetLocalPlayer();
     if (lp ~= nil) then
         makeNameChangerSilent();
+    else
+        apply_clicked = false;
     end
     if (itembox_index == 1) then
         currentName = editName;
