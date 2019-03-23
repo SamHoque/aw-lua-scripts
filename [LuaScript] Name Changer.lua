@@ -90,14 +90,14 @@ local function makeFormingName(wat)
     lastChange = globals.RealTime() + 0.4;
     -- wat 2 and 3 is buggy atm will implement it later
     if (wat == 1) then
-        currentName = editName:sub(currentInt);
+        currentName = editName:sub(currentInt) .. " ";
     elseif (wat == 2) then
-        currentName = editName:sub(0, currentInt);
+        currentName = editName:sub(0, currentInt) .. " ";
     elseif (wat == 3) then
         if (currentInt > fNameLen) then
-            currentName = editName:sub(currentInt);
+            currentName = editName:sub(currentInt) .. " ";
         else
-            currentName = editName:sub(0, currentInt - nameLen);
+            currentName = editName:sub(0, currentInt - nameLen) .. " ";
         end
     end
 end
