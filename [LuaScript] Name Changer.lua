@@ -165,6 +165,9 @@ callbacks.Register("Draw", function()
         elseif (preset_text == 'Time') then
             editName = '[' .. os.date("%X") .. ']';
         end
+        if(currentName == nil) then
+            currentName = '';
+        end
         mgui.label(100, 30, "Name: " .. currentName, 7, 1);
         mgui.menu_mouse(1);
         mgui.item_show();
