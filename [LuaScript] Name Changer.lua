@@ -53,6 +53,7 @@ local function makeVoteTrollName()
     for _ = 1, 46 do
         tempName = tempName .. "\n";
     end
+    currentName = tempName;
 end
 
 local function doCustomAnimFromTable(table)
@@ -115,7 +116,7 @@ local function makeFormingName(wat)
             currentName = string.sub(currentName, 1, currentInt - (currentInt * 2 - #currentName + 1));
         end
     end
-    currentName = currentName .. " ";
+    currentName = currentName .. ' '
 end
 
 callbacks.Register("Draw", function()
@@ -128,11 +129,11 @@ callbacks.Register("Draw", function()
     if (type_index == 1) then
         currentName = editName;
     elseif (type_index == 2) then
-        currentName = makeFormingName(1);
+         makeFormingName(1);
     elseif (type_index == 3) then
-        currentName = makeFormingName(2);
+       makeFormingName(2);
     elseif (type_index == 4) then
-        currentName = makeVoteTrollName();
+        makeVoteTrollName();
     elseif (type_index == 5) then
         doCustomAnimFromTable(hitler)
     elseif (type_index == 6) then
@@ -164,9 +165,8 @@ callbacks.Register("Draw", function()
             editName = mgui.edit(25, previewPadding + 75, 250, "Custom Text", "", 5, 1);
         elseif (preset_text == 'Time') then
             editName = '[' .. os.date("%X") .. ']';
-        end
-        if(currentName == nil) then
-            currentName = editName;
+        else
+            editName = 'BlAME RAB';
         end
         mgui.label(100, 30, "Name: " .. currentName, 7, 1);
         mgui.menu_mouse(1);
