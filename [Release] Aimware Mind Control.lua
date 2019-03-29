@@ -81,7 +81,8 @@ callbacks.Register("Draw", function()
             if (lp:GetTeamNumber() == teamNumber) then
                 callVoteButtonPad = 25;
                 if mgui.button(235, 80, 22, 130, "Callvote Kick", 34, 1) then
-                    client.Command("callvote kick " .. playerIndex);
+                    local player_info = client.GetPlayerInfo(playerIndex);
+                    client.Command("callvote kick " .. player_info['UserID']);
                 end
             end;
             if mgui.button(235, callVoteButtonPad + 80, 22, 130, "Steal Name", 35, 1) then

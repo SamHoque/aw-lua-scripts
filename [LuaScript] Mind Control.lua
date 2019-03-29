@@ -2,6 +2,19 @@
 if (SenseUI == nil) then RunScript("senseui.lua"); end;
 local selected, scroll, shouldCallVote, shouldStealName, showBots, showEnemies, showTeam, showGradient, shouldScramble, shouldSwitch, shouldChangeMap, nameToSteal, alreadyPressedKicked, alreadyPressedScramble, alreadyPressedSwitch, alreadyPressedChangeMap, shouldClearNameHistory = 0, 0, false, false, false, true, true, true, false, false, false, nil, false, false, false, false, false;
 
+local oldName = client.GetConVar("name");
+local loaded = false;
+
+local function isBot(player)
+    return entities.GetPlayerResources():GetPropInt("m_iBotDifficulty", player:GetIndex()) > 0;
+end
+
+local function updateShouldAdd(bool, shouldAdd)
+    if (bool ~= true) then
+        shouldAdd = false;
+    end
+    return shouldAdd;
+end
 
 local function fetchPlayers()
     local playerNames, playerIndexs, players, lp, index = {}, {}, entities.FindByClass("CCSPlayer"), entities.GetLocalPlayer(), 1;
@@ -9,24 +22,17 @@ local function fetchPlayers()
         local player = players[i];
         local pIndex = player:GetIndex();
         if (player:IsPlayer() and (pIndex ~= lp:GetIndex() and pIndex ~= 1)) then
-            local ping = entities.GetPlayerResources():GetPropInt("m_iPing", pIndex);
             local teamNumber = player:GetTeamNumber();
             local lTeamNumber = lp:GetTeamNumber();
             local shouldAdd = true;
-            if (ping < 0) then
-                if (showBots ~= true) then
-                    shouldAdd = false;
-                end
-            end;
             if (teamNumber ~= lTeamNumber) then
-                if (showEnemies ~= true) then
-                    shouldAdd = false;
-                end
+                shouldAdd = updateShouldAdd(showEnemies, shouldAdd);
             end;
             if (teamNumber == lTeamNumber) then
-                if (showTeam ~= true) then
-                    shouldAdd = false;
-                end
+                shouldAdd = updateShouldAdd(showTeam, shouldAdd);
+            end;
+            if (isBot(player)) then
+                shouldAdd = updateShouldAdd(showBots, shouldAdd);
             end;
             if (shouldAdd) then
                 playerNames[index] = player:GetName();
@@ -39,8 +45,10 @@ local function fetchPlayers()
 end
 
 local function stealName()
+    local lp = entities.GetLocalPlayer();
+    if (lp == nil) then nameToSteal = nil; return end;
     if (nameToSteal ~= nil) then
-        client.SetConVar("name", '​' .. nameToSteal, 0)
+        client.SetConVar("name", nameToSteal, 0)
     end;
 end
 
@@ -82,7 +90,8 @@ callbacks.Register("Draw", function()
                         shouldCallVote = SenseUI.Button("Callvote Kick", 120, 25);
                         if shouldCallVote then
                             if (alreadyPressedKicked ~= true) then
-                                client.Command("callvote kick " .. playerIndex);
+                                local player_info = client.GetPlayerInfo(playerIndex);
+                                client.Command("callvote kick " .. player_info['UserID']);
                                 alreadyPressedKicked = true;
                             end;
                         else
@@ -91,7 +100,7 @@ callbacks.Register("Draw", function()
                     end;
                     shouldStealName = SenseUI.Button("Steal Name", 120, 25);
                     if shouldStealName then
-                        nameToSteal = player:GetName();
+                        nameToSteal = '​' .. player:GetName();
                     end;
                 end;
             end;
@@ -140,9 +149,9 @@ callbacks.Register("Draw", function()
             else
                 alreadyPressedChangeMap = false;
             end;
-            shouldClearNameHistory = SenseUI.Button("Clear Name History", 120, 22);
+            shouldClearNameHistory = SenseUI.Button("Restore Name", 120, 22);
             if shouldClearNameHistory then
-                nameToSteal = nil;
+                nameToSteal = oldName;
             end;
             SenseUI.EndGroup();
         end;
