@@ -2,13 +2,15 @@ local ref = gui.Reference("MISC", "AUTOMATION", "Other");
 local showMenu = gui.Checkbox(ref, "rab_autobuy_showmenu", "Show Auto Buy Menu", false);
 local menuPressed = 1;
 local primaryWeapons = {
+    {"None", nil};
     { "SCAR 20 | G3SG1", "scar20" };
-    { "SG 008", "ssg08" };
+    { "SSG 008", "ssg08" };
     { "AWP", "awp" };
     { "G3 SG1 | AUG", "sg556" };
     { "AK 47 | M4A1", "ak47" };
 };
 local secondaryWeapons = {
+    {"None", nil};
     { "Dual Elites", "elite" };
     { "Desert Eagle | R8 Revolver", "deagle" };
     { "Five Seven | Tec 9", "tec9" };
@@ -33,8 +35,8 @@ local enabled = gui.Checkbox(autoBuyGroup, "rab_autobuy_masterswitch", "Enabled 
 local printLogs = gui.Checkbox(autoBuyGroup, "rab_autobuy_printlogs", "Print Logs To Aimware Console", false);
 local concatCommand = gui.Checkbox(autoBuyGroup, "rab_autobuy_concat", "Concact Buy Command", false);
 concatCommand:SetValue(true);
-local primaryWeaponSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_primary_weapon", "Primary Weapon", primaryWeapons[1][1], primaryWeapons[2][1], primaryWeapons[3][1], primaryWeapons[4][1], primaryWeapons[5][1]);
-local secondaryWeaponSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_secondary_weapon", "Secondary Weapon", secondaryWeapons[1][1], secondaryWeapons[2][1], secondaryWeapons[3][1], secondaryWeapons[4][1]);
+local primaryWeaponSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_primary_weapon", "Primary Weapon", primaryWeapons[1][1], primaryWeapons[2][1], primaryWeapons[3][1], primaryWeapons[4][1], primaryWeapons[5][1], primaryWeapons[6][1]);
+local secondaryWeaponSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_secondary_weapon", "Secondary Weapon", secondaryWeapons[1][1], secondaryWeapons[2][1], secondaryWeapons[3][1], secondaryWeapons[4][1], secondaryWeapons[5][1]);
 local armorSelection = gui.Combobox(autoBuyGroup, "rab_autobuy_armor", "Armor", armors[1][1], armors[2][1], armors[3][1]);
 armorSelection:SetValue(2);
 local granadeSlot1 = gui.Combobox(autoBuyGroup, "rab_autobuy_grenade_slot_1", "Grenade Slot #1", granades[1][1], granades[2][1], granades[3][1], granades[4][1], granades[5][1], granades[6][1]);
@@ -103,11 +105,11 @@ callbacks.Register('FireGameEvent', function(e)
     table.insert(stuffToBuy, getSingleTableItem(secondaryWeaponSelection, secondaryWeapons));
     insertToTableNonNull(stuffToBuy, getMultiTableItems(armorSelection, armors));
     inserToTableBool(stuffToBuy, defuseKit, 'defuser');
-    inserToTableBool(stuffToBuy, taser, 'taser');
     insertToTableNonNull(stuffToBuy, getMultiTableItems(granadeSlot1, granades));
     insertToTableNonNull(stuffToBuy, getMultiTableItems(granadeSlot2, granades));
     insertToTableNonNull(stuffToBuy, getMultiTableItems(granadeSlot3, granades));
     insertToTableNonNull(stuffToBuy, getMultiTableItems(granadeSlot4, granades));
+    inserToTableBool(stuffToBuy, taser, 'taser');
     buy(stuffToBuy, concatCommand:GetValue());
 end);
 
