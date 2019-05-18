@@ -1,4 +1,5 @@
 --[=====[
+
     Anti Kick Vote Made by Rab(SamzSakerz#4758)
              __        __
             |__)  /\  |__)
@@ -19,6 +20,7 @@ for i = 1, #eventsToListen do
 end
 
 -- Create the window for adding options for anti kick.
+local aimwareMenu = gui.Reference("MENU");
 local windowW, windowH = 200, 275;
 local mainWindow = gui.Window("rab_anti_kick_menu", "Anti Kick", 200, 200, windowW, windowH);
 local settingsGroup = gui.Groupbox(mainWindow, "Settings", 13, 13, windowW - 25, windowH - 55);
@@ -26,7 +28,8 @@ local settingsGroup = gui.Groupbox(mainWindow, "Settings", 13, 13, windowW - 25,
 -- Add options to the window
 local enable = gui.Checkbox(settingsGroup, "rab_anti_kick_enabled", "Enable Anti Kick", false);
 local joinSpec = gui.Checkbox(settingsGroup, "rab_anti_kick_join_spec", "Join Spectators", false);
-local switchTeam = gui.Checkbox(settingsGroup, "rab_anti_kick_switch_team", "Switch Team", false); ;
+local switchTeam = gui.Checkbox(settingsGroup, "rab_anti_kick_switch_team", "Switch Team", false);
+
 local voteThreshold = gui.Slider(settingsGroup, "rab_anti_kick_threshold", "Scramble threshold %", 80, 1, 100);
 
 -- Add info bar options to window
@@ -35,9 +38,6 @@ local theme = gui.Combobox(settingsGroup, "rab_anti_kick_info_bar_theme", "Info 
 
 -- Add option to enable/disable window via aw menu
 local showMenu = gui.Checkbox(gui.Reference("MISC", "AUTOMATION", "Other"), "rab_anti_kick_show", "Show Anti Kick Menu", false);
-
--- Keep track of aw menu
-local menuPressed = 1;
 
 -- Needed Variables for the vote feature to work.
 local self_voted = false;
@@ -59,18 +59,18 @@ local RabFonts = { Verdana17400 = draw.CreateFont("Verdana", 17, 400), Verdana13
 -- Register callback for our DispatchUserMessage event.
 callbacks.Register("DispatchUserMessage", function(um)
     local id = um:GetID();
-   -- if(id > 40 and id < 50) then print(id) end;
+    -- if(id > 40 and id < 50) then print(id) end;
     if (id == 46 and enable:GetValue()) then
         local lp = entities.GetLocalPlayer();
         -- Entity Index of the person who started the vote
         local vote_starter_entid = um:GetInt(2);
         if (lp == nil) then
             return
-        end;
+        end ;
         local localPlayerIndex = lp:GetIndex();
-      --  print("vote started by id: " .. vote_starter_entid .. " our id is: ".. localPlayerIndex)
+        --  print("vote started by id: " .. vote_starter_entid .. " our id is: ".. localPlayerIndex)
         if (vote_starter_entid == localPlayerIndex) then
-         --   print("we just called a vote")
+            --   print("we just called a vote")
             -- We are calling the vote so lets reset some cache
             self_voted, self_being_kicked, vote_yes_count, potentialVotes = true, false, 0, 0;
         else
@@ -86,14 +86,14 @@ callbacks.Register("DispatchUserMessage", function(um)
     elseif id == 48 then
         -- Check if the vote kick on us has failed and reset cache
         if (self_being_kicked) then
-             self_being_kicked, vote_yes_count, potentialVotes = false, 0, 0;
+            self_being_kicked, vote_yes_count, potentialVotes = false, 0, 0;
         end
     elseif id == 47 then
         -- Check if we have swapped/scrambled/changed level if so lets reset the vote_cool_down value and reset cache.
-       -- print('vote passed')
-       -- print("self_voted: ", tostring(self_voted))
+        -- print('vote passed')
+        -- print("self_voted: ", tostring(self_voted))
         if (self_voted) then
-         --   print('vote passed 2')
+            --   print('vote passed 2')
             self_voted, self_being_kicked, vote_yes_count, potentialVotes, vote_cool_down = false, false, 0, 0, 0;
         end
     end
@@ -133,10 +133,7 @@ end);
 -- Register callback for our Draw event.
 callbacks.Register("Draw", function()
     -- Set the visibility of our settings window.
-    if input.IsButtonPressed(gui.GetValue("msc_menutoggle")) then
-        menuPressed = menuPressed == 0 and 1 or 0;
-    end
-    mainWindow:SetActive(showMenu:GetValue() and menuPressed or 0);
+    mainWindow:SetActive(showMenu:GetValue() and aimwareMenu:IsActive());
 
     -- Check if we have anti vote enabled, if not lets return.
     if (enable:GetValue() ~= true) then
@@ -180,19 +177,19 @@ callbacks.Register("Draw", function()
             end
             -- check if we are in spectators and vote_cool_down has ended
         elseif (lp:GetTeamNumber() == 1 and vote_cool_down ~= 0 and vote_cool_down < globals.RealTime()) then
-            vote_cool_down = 0;
+            vote_cool_down, last_team_in = 0, 1;
             client.Command("jointeam  0 " .. last_team_in);
             -- check if we aren't in specs and vote_cool_down hasn't ended
         elseif (lp:GetTeamNumber() ~= 1 and vote_cool_down ~= 0) then
             --TODO: Implement something
         end
-        else
+    else
         self_voted, self_being_kicked, vote_yes_count, potentialVotes, vote_cool_down = false, false, 0, 0, 0;
-    end;
-    local remainingTime = math.ceil((vote_cool_down -  globals.RealTime()) * 100) / 100;
-    if(remainingTime < 0 and vote_cool_down ~= 0) then
-        vote_cool_down = 0;
-    end;
+    end
+    local remainingTime = math.ceil((vote_cool_down - globals.RealTime()) * 100) / 100;
+    if (remainingTime < 0 and vote_cool_down ~= 0) then
+        vote_cool_down, last_team_in = 0, 1;
+    end
     if (drawInfo:GetValue()) then
         if input.IsButtonDown(1) then
             mouseX, mouseY = input.GetMousePos();
@@ -229,10 +226,10 @@ callbacks.Register("Draw", function()
         rgb = text_color[currentTheme];
         draw.Color(rgb[1], rgb[2], rgb[3], 255);
         draw.SetFont(RabFonts.Verdana13400);
-        if(vote_cool_down == 0) then
+        if (vote_cool_down == 0) then
             remainingTime = "N/A"
-        end;
+        end
         draw.Text(x + 5, (y + topbarSize) + 5, "Remaining Time: " .. remainingTime)
-        draw.Text(x + 5, (y + topbarSize) + 20, "Team to join back in: " .. (last_team_in == 2 and "T" or last_team_in == 3 and"CT" or "N/A"))
+        draw.Text(x + 5, (y + topbarSize) + 20, "Team to join back in: " .. (last_team_in == 2 and "T" or last_team_in == 3 and "CT" or "N/A"))
     end
 end)
